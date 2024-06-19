@@ -30,6 +30,7 @@ public class PlayerMovement : MonoBehaviour
     /// them in the previous frame.
     /// </summary>
     private bool _grounded;
+
     private void Awake()
     {
         _playerCollider = GetComponent<CapsuleCollider2D>();
