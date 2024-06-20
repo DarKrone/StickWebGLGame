@@ -15,13 +15,13 @@ public class PogoStickSecond : MonoBehaviour
     [SerializeField] private GameObject _leftPoint;
     [SerializeField] private GameObject _rightPoint;
 
-    private float _sizeLeft;
-    private float _sizeRight;
+    public float _sizeLeft;
+    public float _sizeRight;
 
     private Rigidbody2D _playerRB;
-    private bool _isAttachedRight = false;
-    private bool _isAttachedLeft = false;
-    private bool _isGrowing = false;
+    public bool _isAttachedRight = false;
+    public bool _isAttachedLeft = false;
+    public bool _isGrowing = false;
 
     void Start()
     {
@@ -32,22 +32,9 @@ public class PogoStickSecond : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {
-        if (!_isAttachedRight && !_isAttachedLeft)
-        {
-            transform.position = _player.transform.position;
-            _playerRB.gravityScale = 1f;
-        }
-        else
-        {
-            _playerRB.gravityScale = 0f;
-        }
-
-        
+    {    
         if (Input.GetKey(KeyCode.LeftArrow))
         {
-            //_leftPoint.transform.RotateAround(transform.position, new Vector3(0, 0, 1), _rotationSpeed);
-            //_rightPoint.transform.RotateAround(transform.position, new Vector3(0, 0, 1), _rotationSpeed);
             if (_isAttachedRight && !_isAttachedLeft)
             {
                 transform.RotateAround(_rightPoint.transform.position, Vector3.forward, _rotationSpeed);
@@ -64,8 +51,6 @@ public class PogoStickSecond : MonoBehaviour
         }
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            //_leftPoint.transform.RotateAround(transform.position, new Vector3(0, 0, -1), _rotationSpeed);
-            //_rightPoint.transform.RotateAround(transform.position, new Vector3(0, 0, -1), _rotationSpeed);
             if (_isAttachedRight && !_isAttachedLeft)
             {
                 transform.RotateAround(_rightPoint.transform.position, Vector3.back, _rotationSpeed);
@@ -84,6 +69,8 @@ public class PogoStickSecond : MonoBehaviour
             if (!_isAttachedRight)
             {
                 _sizeRight += _shrinkGrowSpeed * Time.deltaTime;
+                
+                // Т.к. одна сторона прикреплена то она больше не растёт => другая сторона должна расти и за прикреплённую тоже, поэтому maxGrow + (maxGrow - sizeLeft)
                 _sizeRight = Mathf.Round(Mathf.Clamp(_sizeRight, _minGrow, _maxGrow + (_maxGrow - _sizeLeft)) * 100) / 100;
 
             }
@@ -100,14 +87,16 @@ public class PogoStickSecond : MonoBehaviour
         {
             if (_isGrowing)
             {
+                // Нам нужно обоим точкам присвоить равную удалённость от центра (только один раз). 
+                // Разная она из-за того что описано выше (одна точка растёт и за другую)
                 float middlePoint = (_sizeLeft + _sizeRight) / 2;
                 _sizeLeft = middlePoint;
                 _sizeRight = middlePoint;
             }
             _sizeRight -= _autoShrinkSpeed * Time.deltaTime;
             _sizeLeft -= _autoShrinkSpeed * Time.deltaTime;
-            _sizeRight = Mathf.Round(Mathf.Clamp(_sizeRight, _minGrow, _maxGrow + (_maxGrow - _sizeLeft)) * 100) / 100;
-            _sizeLeft = Mathf.Round(Mathf.Clamp(_sizeLeft, _minGrow, _maxGrow + (_maxGrow - _sizeRight)) * 100) / 100;
+            _sizeRight = Mathf.Round(Mathf.Clamp(_sizeRight, _minGrow, _maxGrow) * 100) / 100;
+            _sizeLeft = Mathf.Round(Mathf.Clamp(_sizeLeft, _minGrow, _maxGrow) * 100) / 100;
             _isGrowing = false;
         }
 
@@ -168,10 +157,17 @@ public class PogoStickSecond : MonoBehaviour
         if (_isAttachedLeft || _isAttachedRight)
             _player.transform.position = (_rightPoint.transform.position + _leftPoint.transform.position) / 2;
 
-        Debug.DrawLine(_player.transform.position, (_rightPoint.transform.position + _leftPoint.transform.position) / 2);
+        if (!_isAttachedRight && !_isAttachedLeft)
+        {
+            transform.position = _player.transform.position;
+            _playerRB.gravityScale = 1f;
+        }
+        else
+        {
+            _playerRB.gravityScale = 0f;
+        }
 
-        Debug.Log("Size left - " + _sizeLeft);
-        Debug.Log("Size right - " + _sizeRight);
+        Debug.DrawLine(_player.transform.position, (_rightPoint.transform.position + _leftPoint.transform.position) / 2);
     }
 
     
