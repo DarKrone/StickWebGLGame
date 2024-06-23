@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PogoStickSecond : MonoBehaviour
@@ -23,46 +24,61 @@ public class PogoStickSecond : MonoBehaviour
     public bool _isAttachedLeft = false;
     public bool _isGrowing = false;
 
+    [SerializeField] private bool _isGroundedRight = false;
+    [SerializeField] private bool _isGroundedLeft = false;
+
     void Start()
     {
         _playerRB = _player.GetComponent<Rigidbody2D>();
         _sizeRight = _minGrow;
         _sizeLeft = _minGrow;
     }
+    private Vector3 UpperPoint()
+    {
 
+        return Vector3.zero;
+    }
     // Update is called once per frame
     void Update()
-    {    
+    {   
         if (Input.GetKey(KeyCode.LeftArrow))
         {
-            if (_isAttachedRight && !_isAttachedLeft)
+            if (_isGroundedRight && !_isGroundedLeft)
             {
                 transform.RotateAround(_rightPoint.transform.position, Vector3.forward, _rotationSpeed);
             }
-            else if (_isAttachedLeft && !_isAttachedRight)
+            else if (_isGroundedLeft && !_isGroundedRight)
             {
                 transform.RotateAround(_leftPoint.transform.position, Vector3.forward, _rotationSpeed);
             }
-            else if (!_isAttachedLeft && !_isAttachedRight)
+            else if (!_isGroundedLeft && !_isGroundedRight)
             {
                 transform.Rotate(0, 0, 1 * _rotationSpeed);
             }
+            //else
+            //{
+            //    transform.RotateAround(_leftPoint.transform.position, Vector3.back, _rotationSpeed);
+            //}
 
         }
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            if (_isAttachedRight && !_isAttachedLeft)
+            if (_isGroundedRight && !_isGroundedLeft)
             {
                 transform.RotateAround(_rightPoint.transform.position, Vector3.back, _rotationSpeed);
             }
-            else if (_isAttachedLeft && !_isAttachedRight)
+            else if (_isGroundedLeft && !_isGroundedRight)
             {
                 transform.RotateAround(_leftPoint.transform.position, Vector3.back, _rotationSpeed);
             }
-            else if (!_isAttachedLeft && !_isAttachedRight)
+            else if (!_isGroundedLeft && !_isGroundedRight)
             {
                 transform.Rotate(0, 0, -1 * _rotationSpeed);
             }
+            //else
+            //{
+            //    transform.RotateAround(_rightPoint.transform.position, Vector3.back, _rotationSpeed);
+            //}
         }
         if (Input.GetKey(KeyCode.UpArrow))
         {
@@ -108,47 +124,27 @@ public class PogoStickSecond : MonoBehaviour
 
 
         //--------------------------------------------Правый-------------------------------------------
-        Collider2D[] hits = Physics2D.OverlapCircleAll(_rightPoint.transform.position, 0.1f, LayerMask.GetMask("Default"));
+        RaycastHit2D hit = Physics2D.CircleCast(_rightPoint.transform.position, 0.1f,Vector2.zero,0,LayerMask.GetMask("Default"));
 
-        if (hits.Length > 0)
-        {
-            if (_isGrowing)
-            {
-                _isAttachedRight = true;
-            }
-            else
-            {
-                _isAttachedRight = false;
-            }
-        }
-        
-        else
-        {
-            _isAttachedRight = false;
-        }
+        _isAttachedRight = hit.transform != null &&
+                           _isGrowing;
+
+        _isGroundedRight = _isAttachedRight &&
+                           _player.transform.position.y >= hit.point.y;
 
 
 
 
         //--------------------------------------------Левый-------------------------------------------
 
-        hits = Physics2D.OverlapCircleAll(_leftPoint.transform.position, 0.1f, LayerMask.GetMask("Default"));
+        hit = Physics2D.CircleCast(_leftPoint.transform.position, 0.1f, Vector2.zero, 0, LayerMask.GetMask("Default"));
 
-        if (hits.Length > 0)
-        {
-            if (_isGrowing)
-            {
-                _isAttachedLeft = true;
-            }
-            else
-            {
-                _isAttachedLeft = false;
-            }
-        }
-        else
-        {
-            _isAttachedLeft = false;
-        }
+        _isAttachedLeft = hit.transform != null &&
+                           _isGrowing;
+
+        _isGroundedLeft = _isAttachedLeft &&
+                           _player.transform.position.y >= hit.point.y;
+
 
 
 
