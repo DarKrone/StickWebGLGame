@@ -118,7 +118,6 @@ public class PogoStickSecond : MonoBehaviour
 
         //_sizeLeft = Mathf.Round(Mathf.Clamp(_sizeLeft, _minGrow, _maxGrow + (_maxGrow -_sizeRight)) * 100) / 100;
         
-
         _leftPoint.transform.localPosition = new Vector3(-_sizeLeft, 0, 0);
         _rightPoint.transform.localPosition = new Vector3(_sizeRight, 0, 0);
 
@@ -150,8 +149,8 @@ public class PogoStickSecond : MonoBehaviour
 
 
         //Вставить игрока между точками
-        if (_isAttachedLeft || _isAttachedRight)
-            _player.transform.position = (_rightPoint.transform.position + _leftPoint.transform.position) / 2;
+        //if (_isAttachedLeft || _isAttachedRight)
+        //    _player.transform.position = (_rightPoint.transform.position + _leftPoint.transform.position) / 2;
 
         if (!_isAttachedRight && !_isAttachedLeft)
         {
